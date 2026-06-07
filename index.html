@@ -362,6 +362,33 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
 .stog-btn{flex:1;padding:8px 6px;font-size:12px;font-weight:600;font-family:'Manrope',sans-serif;background:transparent;color:var(--text2);border:none;cursor:pointer;transition:all 0.15s;text-align:center;}
 .stog-btn.active-sal{background:rgba(126,232,176,0.12);color:var(--green);}
 .stog-btn.active-oth{background:rgba(232,126,126,0.1);color:var(--red);}
+
+/* ── CREDIT CARDS ── */
+.cc-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;transition:all 0.25s;position:relative;overflow:hidden;}
+.cc-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,0.35);}
+.cc-card-bar{height:3px;border-radius:99px;margin-bottom:16px;}
+.cc-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;margin-bottom:14px;}
+.cc-limit-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
+.cc-balance-val{font-family:'Fraunces',serif;font-size:28px;font-weight:300;line-height:1;}
+.cc-prog-track{height:6px;background:var(--surface3);border-radius:99px;overflow:hidden;margin:10px 0 6px;}
+.cc-prog-fill{height:100%;border-radius:99px;transition:width 0.5s cubic-bezier(.4,0,.2,1);}
+.cc-stat-row{display:flex;justify-content:space-between;font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);}
+.cc-tx-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background 0.12s;animation:slideIn 0.2s ease both;}
+.cc-tx-row:hover{background:var(--surface2);}
+.cc-tx-row:last-child{border-bottom:none;}
+.cc-tx-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.cc-tx-info{flex:1;min-width:0;}
+.cc-tx-desc{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cc-tx-meta{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
+.cc-tx-right{text-align:right;flex-shrink:0;}
+.cc-tx-amt{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;}
+.cc-add-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:20px;}
+.cc-pay-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:99px;cursor:pointer;transition:all 0.15s;}
+.cc-summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;}
+.due-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:99px;font-weight:500;}
+.due-ok{background:rgba(126,232,176,0.1);color:var(--green);border:1px solid rgba(126,232,176,0.2);}
+.due-warn{background:rgba(232,201,126,0.1);color:var(--accent);border:1px solid rgba(232,201,126,0.2);}
+.due-over{background:rgba(232,126,126,0.1);color:var(--red);border:1px solid rgba(232,126,126,0.2);}
 </style>
 </head>
 <body>
@@ -414,6 +441,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
       <button class="nav-tab" onclick="showPage('analysis',this)">Analysis</button>
       <button class="nav-tab" onclick="showPage('monthly',this)">Monthly</button>
       <button class="nav-tab" onclick="showPage('annual',this)">Annual</button>
+      <button class="nav-tab" onclick="showPage('creditcards',this)">💳 Credit Cards</button>
       <button class="nav-tab" onclick="showPage('settings',this)">Settings</button>
       <div class="nav-right">
         <button class="lockout-btn" onclick="lockApp()">🔒 Lock</button>
@@ -625,8 +653,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
             <button onclick="document.getElementById('importFileInput').click()" style="padding:10px;background:var(--accent-dim);border:1px solid rgba(232,201,126,0.25);border-radius:var(--r-sm);color:var(--accent);font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">⬆ Import JSON backup</button>
             <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importData(event)"/>
             <div id="importMsg" style="font-size:12px;text-align:center;font-family:'DM Mono',monospace;min-height:14px;"></div>
-            <button onclick="copySyncLink()" style="padding:10px;background:rgba(126,232,176,0.08);border:1px solid rgba(126,232,176,0.2);border-radius:var(--r-sm);color:var(--green);font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">🔗 Copy Sync Link</button>
-            <div id="syncMsg" style="font-size:12px;text-align:center;font-family:'DM Mono',monospace;min-height:14px;line-height:1.5;"></div>
             <button onclick="clearData()" style="padding:10px;background:none;border:1px solid rgba(232,126,126,0.2);border-radius:var(--r-sm);color:var(--red);font-family:'Manrope',sans-serif;font-size:13px;cursor:pointer;">Clear all data</button>
           </div>
         </div>
@@ -703,6 +729,81 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
         <div class="bsh-subtitle" id="bshSubtitle">All Accounts · All time</div>
       </div>
       <div class="bsh-body" id="bshBody"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE: CREDIT CARDS ═══ -->
+  <div class="page" id="page-creditcards">
+    <div class="page-heading"><em>Credit</em> Cards</div>
+    <div class="page-sub">Track spending, limits & due dates</div>
+
+    <!-- 3 card overview row -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:20px;" id="ccCardGrid"></div>
+
+    <!-- Summary row -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;" id="ccSummaryRow"></div>
+
+    <!-- Add CC transaction -->
+    <div class="cc-add-form" id="ccAddForm">
+      <div class="section-title" style="margin-bottom:12px;">Add Credit Card Transaction</div>
+
+      <!-- Card selector tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="ccCardTabs"></div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+        <div class="field"><label>Description</label><input type="text" id="ccDesc" placeholder="e.g. Amazon, Zomato…"/></div>
+        <div class="field"><label>Amount (₹)</label>
+          <div style="display:flex;gap:6px;">
+            <input type="number" id="ccAmt" placeholder="0.00" min="0" step="0.01" style="flex:1;min-width:0;"/>
+            <button type="button" class="calc-open-btn" onclick="openCalc()" title="Calculator">🧮</button>
+          </div>
+        </div>
+        <div class="field"><label>Category</label><select id="ccCat">
+          <option>Food & Dining</option><option>Shopping</option><option>Fuel</option>
+          <option>Entertainment</option><option>Travel</option><option>Grocery</option>
+          <option>Medical</option><option>Bills & Utilities</option><option>EMI</option>
+          <option>Other</option>
+        </select></div>
+        <div class="field"><label>Date</label><input type="date" id="ccDate"/></div>
+      </div>
+      <div class="field" style="margin-bottom:10px;"><label>Note (optional)</label><input type="text" id="ccNote" placeholder="Any note…"/></div>
+      <button class="submit-btn" onclick="addCCTx()">Add Credit Card Spend ↗</button>
+    </div>
+
+    <!-- Record a payment -->
+    <div class="cc-add-form" style="border-color:rgba(126,232,176,0.2);">
+      <div class="section-title" style="margin-bottom:12px;">Record Payment / Bill Clearance</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;">
+        <div class="field"><label>Card</label><select id="ccPayCard" id="ccPayCard"></select></div>
+        <div class="field"><label>Amount paid (₹)</label><input type="number" id="ccPayAmt" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Date</label><input type="date" id="ccPayDate"/></div>
+      </div>
+      <button class="submit-btn" style="background:rgba(126,232,176,0.1);border-color:rgba(126,232,176,0.25);color:var(--green);" onclick="addCCPayment()">Mark as Paid ✓</button>
+    </div>
+
+    <!-- Card Cycle Settings -->
+    <div class="cc-add-form" style="border-color:rgba(176,126,232,0.25);margin-bottom:20px;">
+      <div class="section-title" style="margin-bottom:4px;">⚙️ &nbsp;Card Cycle Settings</div>
+      <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:16px;line-height:1.7;">Set bill generation date, due date, and carried-forward opening balance for each card.</div>
+      <div id="ccCycleFields"></div>
+      <button class="submit-btn" style="background:rgba(176,126,232,0.1);border-color:rgba(176,126,232,0.25);color:var(--purple);margin-top:4px;" onclick="saveCCCycleSettings()">Save Settings ✓</button>
+      <div id="ccCycleMsg" style="font-size:11px;text-align:center;font-family:'DM Mono',monospace;color:var(--green);min-height:14px;margin-top:8px;"></div>
+    </div>
+
+    <!-- Transactions list -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div class="section-title" style="margin:0;" id="ccTxLabel">All transactions</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="ccFilterTabs"></div>
+        <div class="mnav">
+          <button class="mnav-btn" onclick="ccChangeMonth(-1)">‹</button>
+          <div class="mnav-label" id="ccMonthLabel">—</div>
+          <button class="mnav-btn" onclick="ccChangeMonth(1)">›</button>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;" id="ccTxList">
+      <div class="tx-empty">No credit card transactions yet.</div>
     </div>
   </div>
 
@@ -1044,12 +1145,13 @@ function showPage(id,btn){
     renderOverview();
   } else {
     setNavVisible(true);
-    if(calcBtn) calcBtn.style.display = id==='transactions'?'flex':'none';
+    if(calcBtn) calcBtn.style.display = (id==='transactions'||id==='creditcards')?'flex':'none';
     if(id==='transactions') updateTxPage();
     if(id==='analysis')    renderAnalysis();
     if(id==='monthly')     renderMonthly();
     if(id==='annual')      renderAnnual();
     if(id==='settings')    initSettings();
+    if(id==='creditcards') renderCreditCards();
   }
 }
 
@@ -1204,9 +1306,9 @@ function updateAll(){
   const activePage=document.querySelector('.page.active');
   if(!activePage)return;
   const id=activePage.id.replace('page-','');
-  // Show calculator only on transactions page
+  // Show calculator only on transactions and creditcards pages
   const calcBtn=document.getElementById('calcBtn');
-  if(calcBtn) calcBtn.style.display = id==='transactions'?'flex':'none';
+  if(calcBtn) calcBtn.style.display = (id==='transactions'||id==='creditcards')?'flex':'none';
   if(id==='overview'){ setNavVisible(false); renderOverview(); }
   if(id==='transactions'){ setNavVisible(true); updateTxPage(); }
   if(id==='analysis'){ setNavVisible(true); renderAnalysis(); }
@@ -2181,64 +2283,6 @@ function importData(e){
   };
   reader.readAsText(file);
 }
-function copySyncLink(){
-  try{
-    const payload={txns,budget,openingBals,accountBudgets};
-    const json=JSON.stringify(payload);
-    const b64=btoa(unescape(encodeURIComponent(json)));
-    const url=window.location.origin+window.location.pathname+'#data='+b64;
-    navigator.clipboard.writeText(url).then(()=>{
-      const msg=document.getElementById('syncMsg');
-      msg.style.color='var(--green)';
-      msg.textContent='✓ Sync link copied! Open it on any device to load your data.';
-      setTimeout(()=>msg.textContent='',5000);
-    });
-  }catch(err){
-    const msg=document.getElementById('syncMsg');
-    msg.style.color='var(--red)';
-    msg.textContent='✗ Failed to copy: '+err.message;
-    setTimeout(()=>msg.textContent='',4000);
-  }
-}
-function loadFromUrl(){
-  const hash=window.location.hash;
-  if(!hash.startsWith('#data=')) return;
-  try{
-    const b64=hash.slice(6);
-    const json=decodeURIComponent(escape(atob(b64)));
-    const d=JSON.parse(json);
-    if(!d.txns||!Array.isArray(d.txns)) return;
-    // Show a nice banner instead of a plain confirm
-    const banner=document.createElement('div');
-    banner.id='syncBanner';
-    banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#13151a;border-bottom:2px solid rgba(126,232,176,0.4);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 8px 32px rgba(0,0,0,0.5);';
-    banner.innerHTML=`
-      <div>
-        <div style="font-size:14px;font-weight:600;color:#e4e6ed;margin-bottom:3px;">📲 Sync data detected</div>
-        <div style="font-size:12px;color:#7c8394;font-family:'DM Mono',monospace;">${d.txns.length} transactions found in sync link</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="document.getElementById('syncBanner').remove();window.location.hash='';"
-          style="padding:8px 16px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#7c8394;font-family:'Manrope',sans-serif;font-size:13px;cursor:pointer;">Ignore</button>
-        <button onclick="applySyncData(${JSON.stringify(d).replace(/</g,'&lt;')})"
-          style="padding:8px 18px;background:rgba(126,232,176,0.12);border:1px solid rgba(126,232,176,0.3);border-radius:8px;color:#7ee8b0;font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Load Data →</button>
-      </div>`;
-    document.body.appendChild(banner);
-  }catch(e){}
-}
-function applySyncData(d){
-  txns=d.txns;
-  if(typeof d.budget==='number') budget=d.budget;
-  if(d.openingBals) openingBals=d.openingBals;
-  if(d.accountBudgets) accountBudgets=d.accountBudgets;
-  save();updateAll();buildAcctBar();
-  const banner=document.getElementById('syncBanner');
-  if(banner){
-    banner.style.borderColor='rgba(126,232,176,0.6)';
-    banner.innerHTML='<div style="font-size:14px;font-weight:600;color:#7ee8b0;padding:4px 0;">✓ '+txns.length+' transactions loaded successfully!</div>';
-    setTimeout(()=>{banner.remove();window.location.hash='';},2500);
-  }
-}
 function clearData(){if(confirm('Delete ALL transactions? Cannot be undone.')){txns=[];save();updateAll();buildAcctBar();}}
 
 // ═══════════════════════════════════════════════════
@@ -2310,8 +2354,11 @@ function calcEval(){
 function calcUseResult(){
   const val=parseFloat(calcResult);
   if(!isNaN(val)&&val>0){
-    document.getElementById('fAmt').value=Math.abs(val).toFixed(2);
-    document.getElementById('fAmt').focus();
+    // Feed into whichever amount field is active
+    const onCC = document.getElementById('page-creditcards')?.classList.contains('active');
+    const targetId = onCC ? 'ccAmt' : 'fAmt';
+    const target = document.getElementById(targetId);
+    if(target){ target.value=Math.abs(val).toFixed(2); target.focus(); }
   }
   calcOpen=false;
   document.getElementById('calcModal').style.display='none';
@@ -2548,15 +2595,612 @@ function renderBalSheet(){
   document.getElementById('bshBody').innerHTML = html;
 }
 
+
+// ═══════════════════════════════════════════════════
+// CREDIT CARDS
+// ═══════════════════════════════════════════════════
+const CC_CARDS = [
+  {id:'hdfc_cc',  name:'HDFC Credit',  limit:100000, color:'#7EB5E8', emoji:'💙', short:'HDFC', billDay:20, dueDay:10},
+  {id:'rbl_cc',   name:'RBL Credit',   limit:49000,  color:'#E87E7E', emoji:'❤️',  short:'RBL',  billDay:20, dueDay:10},
+  {id:'axis_cc',  name:'Axis Credit',  limit:53000,  color:'#B07EE8', emoji:'💜', short:'AXIS', billDay:20, dueDay:10},
+];
+
+const CC_CATS = ['Food & Dining','Shopping','Fuel','Entertainment','Travel','Grocery','Medical','Bills & Utilities','EMI','Other'];
+const CC_CAT_EMOJI = {'Food & Dining':'🍽️','Shopping':'🛍️','Fuel':'⛽','Entertainment':'🎬','Travel':'✈️','Grocery':'🛒','Medical':'💊','Bills & Utilities':'📱','EMI':'🏦','Other':'📦'};
+
+let ccTxns = [];
+let ccViewMonth = {year: new Date().getFullYear(), month: new Date().getMonth()};
+let ccActiveCard = 'all';
+// ccSettings: per card — {billDay, dueDay, openingBalance}
+let ccSettings = {};
+
+try { ccTxns    = JSON.parse(localStorage.getItem('sf_cc_txns')     || '[]'); } catch(e) {}
+try { ccSettings= JSON.parse(localStorage.getItem('sf_cc_settings') || '{}'); } catch(e) {}
+
+// Apply saved settings into CC_CARDS
+CC_CARDS.forEach(c => {
+  if(ccSettings[c.id]) {
+    if(ccSettings[c.id].billDay) c.billDay = ccSettings[c.id].billDay;
+    if(ccSettings[c.id].dueDay)  c.dueDay  = ccSettings[c.id].dueDay;
+  }
+});
+
+function ccSave() { localStorage.setItem('sf_cc_txns', JSON.stringify(ccTxns)); }
+function ccSettingsSave() {
+  CC_CARDS.forEach(c => {
+    if(!ccSettings[c.id]) ccSettings[c.id] = {};
+    ccSettings[c.id].billDay = c.billDay;
+    ccSettings[c.id].dueDay  = c.dueDay;
+  });
+  localStorage.setItem('sf_cc_settings', JSON.stringify(ccSettings));
+}
+function ccGetOpeningBal(cardId) {
+  return parseFloat((ccSettings[cardId] || {}).openingBalance || 0);
+}
+function ccSetOpeningBal(cardId, val) {
+  if(!ccSettings[cardId]) ccSettings[cardId] = {};
+  ccSettings[cardId].openingBalance = val;
+  localStorage.setItem('sf_cc_settings', JSON.stringify(ccSettings));
+}
+
+// ── BILLING CYCLE HELPERS ──
+// Returns the start date of the current billing cycle for a card
+// Billing cycle: from billDay of last month to billDay-1 of this month
+function ccCycleStart(card, refDate) {
+  const now = refDate || new Date();
+  const billDay = card.billDay;
+  // If today is before billDay, cycle started on billDay of prev month
+  let cycleYear = now.getFullYear(), cycleMonth = now.getMonth();
+  if(now.getDate() < billDay) {
+    cycleMonth--;
+    if(cycleMonth < 0) { cycleMonth = 11; cycleYear--; }
+  }
+  return new Date(cycleYear, cycleMonth, billDay);
+}
+
+// Last bill generation date (most recent billDay that has passed)
+function ccLastBillDate(card) {
+  const now = new Date();
+  const billDay = card.billDay;
+  let y = now.getFullYear(), m = now.getMonth();
+  if(now.getDate() >= billDay) return new Date(y, m, billDay);
+  m--; if(m < 0) { m = 11; y--; }
+  return new Date(y, m, billDay);
+}
+
+// Next due date after the last bill
+function ccNextDueDate(card) {
+  const lastBill = ccLastBillDate(card);
+  // due date is dueDay of the month AFTER bill generation
+  let dy = lastBill.getFullYear(), dm = lastBill.getMonth() + 1;
+  if(dm > 11) { dm = 0; dy++; }
+  const due = new Date(dy, dm, card.dueDay);
+  // if due already passed, advance to next cycle's due
+  const now = new Date();
+  if(due < now) {
+    const nextBill = ccLastBillDate(card);
+    nextBill.setMonth(nextBill.getMonth() + 1);
+    let dy2 = nextBill.getFullYear(), dm2 = nextBill.getMonth() + 1;
+    if(dm2 > 11) { dm2 = 0; dy2++; }
+    return new Date(dy2, dm2, card.dueDay);
+  }
+  return due;
+}
+
+// Statement balance = opening balance + spends on or before last bill date - payments on or before last bill date
+function ccStatementBalance(card) {
+  const lastBill = ccLastBillDate(card);
+  const opening  = ccGetOpeningBal(card.id);
+  return ccTxns.filter(t => t.cardId === card.id).reduce((s, t) => {
+    const d = new Date(t.date + 'T00:00:00');
+    if(d <= lastBill) return t.isPayment ? s - t.amount : s + t.amount;
+    return s;
+  }, opening);
+}
+
+// Unbilled spends = spends strictly after last bill date and not yet billed
+function ccUnbilledSpend(card) {
+  const lastBill = ccLastBillDate(card);
+  return ccTxns.filter(t => {
+    const d = new Date(t.date + 'T00:00:00');
+    return t.cardId === card.id && !t.isPayment && d > lastBill;
+  }).reduce((s, t) => s + t.amount, 0);
+}
+
+// Total outstanding = statement balance + unbilled (minus any post-bill payments)
+function ccTotalOutstanding(card) {
+  const opening = ccGetOpeningBal(card.id);
+  return ccTxns.filter(t => t.cardId === card.id).reduce((s, t) => {
+    return t.isPayment ? s - t.amount : s + t.amount;
+  }, opening);
+}
+
+function ccAvailable(cardId) {
+  const card = CC_CARDS.find(c => c.id === cardId);
+  return card ? Math.max(0, card.limit - Math.max(0, ccTotalOutstanding(card))) : 0;
+}
+
+// kept for backward compat with renderCCCardTabs
+function ccBalance(cardId) {
+  const card = CC_CARDS.find(c => c.id === cardId);
+  return card ? ccTotalOutstanding(card) : 0;
+}
+
+function ccMonthSpend(cardId, year, month) {
+  return ccTxns.filter(t => {
+    const d = new Date(t.date + 'T00:00:00');
+    return t.cardId === cardId && !t.isPayment &&
+      d.getFullYear() === year && d.getMonth() === month;
+  }).reduce((s, t) => s + t.amount, 0);
+}
+
+// ── RENDER CC PAGE ──
+function renderCreditCards() {
+  document.getElementById('ccMonthLabel').textContent = MONTHS[ccViewMonth.month] + ' ' + ccViewMonth.year;
+  renderCCCards();
+  renderCCSummary();
+  renderCCCardTabs();
+  renderCCCycleFields();
+  renderCCPayCardSelect();
+  renderCCFilterTabs();
+  renderCCTxList();
+  // set today date defaults
+  const today = new Date().toISOString().slice(0, 10);
+  if(document.getElementById('ccDate')) document.getElementById('ccDate').value = today;
+  if(document.getElementById('ccPayDate')) document.getElementById('ccPayDate').value = today;
+}
+
+function renderCCCards() {
+  const grid = document.getElementById('ccCardGrid');
+  if(!grid) return;
+  const now = new Date();
+
+  grid.innerHTML = CC_CARDS.map(card => {
+    const stmtBal   = Math.max(0, ccStatementBalance(card));
+    const unbilled  = Math.max(0, ccUnbilledSpend(card));
+    const totalOut  = Math.max(0, ccTotalOutstanding(card));
+    const available = Math.max(0, card.limit - totalOut);
+    const usedPct   = Math.min(100, Math.round(totalOut / card.limit * 100));
+    const minDue    = Math.ceil(stmtBal * 0.05);
+    const barColor  = usedPct >= 90 ? 'var(--red)' : usedPct >= 70 ? 'var(--accent)' : card.color;
+
+    const lastBill  = ccLastBillDate(card);
+    const nextBill  = new Date(lastBill); nextBill.setMonth(nextBill.getMonth() + 1);
+    const dueDate   = ccNextDueDate(card);
+    const daysToDue = Math.ceil((dueDate - now) / 86400000);
+    const daysToNextBill = Math.ceil((nextBill - now) / 86400000);
+
+    const dueLabel  = daysToDue <= 0 ? 'Due today!' : daysToDue === 1 ? 'Due tomorrow' : `Due in ${daysToDue}d`;
+    const dueCls    = daysToDue <= 3 ? 'due-over' : daysToDue <= 7 ? 'due-warn' : 'due-ok';
+    const fmtDate   = d => d.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+
+    // Is statement already cleared (paid in full)?
+    const stmtCleared = stmtBal <= 0;
+
+    return `<div class="cc-card" onclick="ccSetFilter('${card.id}')">
+      <div class="cc-card-bar" style="background:${card.color}"></div>
+
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:${card.color}22;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:${card.color};font-family:'DM Mono',monospace;">${card.short}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">${card.name}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;">Limit ₹${card.limit.toLocaleString('en-IN')}</div>
+          </div>
+        </div>
+        <span class="due-badge ${stmtCleared ? 'due-ok' : dueCls}">${stmtCleared ? '✓ Cleared' : dueLabel}</span>
+      </div>
+
+      <!-- ── CURRENT CYCLE BLOCK ── -->
+      <div style="background:${stmtCleared ? 'rgba(126,232,176,0.05)' : 'rgba(232,126,126,0.05)'};border:1px solid ${stmtCleared ? 'rgba(126,232,176,0.15)' : 'rgba(232,126,126,0.15)'};border-radius:10px;padding:12px;margin-bottom:10px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.13em;text-transform:uppercase;color:${stmtCleared ? 'var(--green)' : 'var(--red)'};margin-bottom:6px;">
+          ${stmtCleared ? '✓ Current Cycle — Paid' : `⚠ Current Cycle — Pay by ${fmtDate(dueDate)}`}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:${stmtCleared ? 'var(--green)' : 'var(--red)'};">₹${stmtBal.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px;">Statement balance</div>
+          </div>
+          ${!stmtCleared ? `<div style="text-align:right;">
+            <div style="font-size:12px;color:var(--red);font-family:'DM Mono',monospace;">Min ₹${minDue.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;">minimum due</div>
+          </div>` : ''}
+        </div>
+        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:6px;">
+          Billed on ${fmtDate(lastBill)} · ${stmtCleared ? 'All clear 🎉' : `${daysToDue}d left to pay`}
+        </div>
+      </div>
+
+      <!-- ── NEXT CYCLE BLOCK ── -->
+      <div style="background:rgba(232,201,126,0.05);border:1px solid rgba(232,201,126,0.12);border-radius:10px;padding:12px;margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.13em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">
+          Next Cycle — Bills on ${fmtDate(nextBill)}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div>
+            <div style="font-family:'Fraunces',serif;font-size:26px;font-weight:300;color:var(--accent);">₹${unbilled.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px;">Unbilled spends so far</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;">${daysToNextBill}d away</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMI Strip (Axis only) -->
+      ${card.id === 'axis_cc' ? (() => {
+        const totalEMIs = 24;
+        const paidEMIs  = ccTxns.filter(t => t.cardId === 'axis_cc' && t.isPayment && t.id.startsWith('axis_emi')).length;
+        const remainEMIs = totalEMIs - paidEMIs;
+        const remainAmt  = remainEMIs * 2161;
+        const pctDone    = Math.round(paidEMIs / totalEMIs * 100);
+        return `<div style="background:rgba(126,181,232,0.07);border:1px solid rgba(126,181,232,0.18);border-radius:10px;padding:11px 13px;margin-bottom:10px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.13em;text-transform:uppercase;color:#7EB5E8;margin-bottom:7px;">💻 Laptop EMI — 24 months</div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-family:'DM Mono',monospace;margin-bottom:6px;">
+            <span style="color:var(--text3);">${paidEMIs} paid · ${remainEMIs} remaining</span>
+            <span style="color:#7EB5E8;">₹${remainAmt.toLocaleString('en-IN')} left</span>
+          </div>
+          <div style="height:4px;background:var(--surface3);border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${pctDone}%;background:#7EB5E8;border-radius:99px;transition:width 0.5s;"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:5px;">₹2,161/month · Next due 10 Jul</div>
+        </div>`;
+      })() : ''}
+
+      <!-- Progress bar -->
+      <div class="cc-prog-track">
+        <div class="cc-prog-fill" style="width:${usedPct}%;background:${barColor};"></div>
+      </div>
+      <div class="cc-stat-row" style="margin-top:5px;">
+        <span>${usedPct}% of limit used</span>
+        <span style="color:var(--green);">₹${available.toLocaleString('en-IN')} free</span>
+      </div>
+
+      <!-- Glow blob -->
+      <div style="position:absolute;width:160px;height:160px;border-radius:50%;background:${card.color};opacity:0.03;bottom:-40px;right:-40px;pointer-events:none;"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderCCSummary() {
+  const row = document.getElementById('ccSummaryRow');
+  if(!row) return;
+  const totalLimit   = CC_CARDS.reduce((s, c) => s + c.limit, 0);
+  const totalOut     = CC_CARDS.reduce((s, c) => s + Math.max(0, ccTotalOutstanding(c)), 0);
+  const totalStmt    = CC_CARDS.reduce((s, c) => s + Math.max(0, ccStatementBalance(c)), 0);
+  const totalUnbill  = CC_CARDS.reduce((s, c) => s + Math.max(0, ccUnbilledSpend(c)), 0);
+  const totalAvail   = totalLimit - totalOut;
+  const totalPct     = Math.round(totalOut / totalLimit * 100);
+  const totalMinDue  = Math.ceil(totalStmt * 0.05);
+
+  row.innerHTML = `
+    <div class="cc-summary-card">
+      <div class="metric-label">Total Limit</div>
+      <div class="metric-value accent">₹${totalLimit.toLocaleString('en-IN')}</div>
+      <div class="metric-sub">across 3 cards</div>
+    </div>
+    <div class="cc-summary-card" style="border-color:rgba(232,126,126,0.2);">
+      <div class="metric-label" style="color:var(--red);">Current Cycle Due</div>
+      <div class="metric-value red">₹${totalStmt.toLocaleString('en-IN')}</div>
+      <div class="metric-sub">pay before 10th Jun</div>
+    </div>
+    <div class="cc-summary-card" style="border-color:rgba(232,201,126,0.2);">
+      <div class="metric-label" style="color:var(--accent);">Next Cycle (Unbilled)</div>
+      <div class="metric-value" style="color:var(--accent);">₹${totalUnbill.toLocaleString('en-IN')}</div>
+      <div class="metric-sub">bills on 20th Jun</div>
+    </div>
+    <div class="cc-summary-card">
+      <div class="metric-label">Total Outstanding</div>
+      <div class="metric-value" style="color:var(--orange);">₹${totalOut.toLocaleString('en-IN')}</div>
+      <div class="metric-sub">${totalPct}% of limit used</div>
+    </div>
+    <div class="cc-summary-card">
+      <div class="metric-label">Total Available</div>
+      <div class="metric-value green">₹${totalAvail.toLocaleString('en-IN')}</div>
+      <div class="metric-sub">${100-totalPct}% free</div>
+    </div>
+    <div class="cc-summary-card" style="border-color:rgba(232,126,126,0.15);">
+      <div class="metric-label">Min Due (All Cards)</div>
+      <div class="metric-value" style="color:var(--red);">₹${totalMinDue.toLocaleString('en-IN')}</div>
+      <div class="metric-sub">5% of statement bal</div>
+    </div>
+  `;
+}
+
+function renderCCCardTabs() {
+  const wrap = document.getElementById('ccCardTabs');
+  if(!wrap) return;
+  let activeCC = wrap.dataset.active || CC_CARDS[0].id;
+  wrap.dataset.active = activeCC;
+  wrap.innerHTML = CC_CARDS.map(c => `
+    <button onclick="document.getElementById('ccCardTabs').dataset.active='${c.id}';renderCCCardTabs();"
+      style="padding:7px 14px;border-radius:99px;border:1px solid ${c.id===activeCC?c.color+'55':'var(--border2)'};background:${c.id===activeCC?c.color+'18':'transparent'};color:${c.id===activeCC?c.color:'var(--text2)'};font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;">
+      ${c.short} · ₹${(c.limit - Math.max(0,ccBalance(c.id))).toLocaleString('en-IN')} free
+    </button>`).join('');
+}
+
+function renderCCCycleFields() {
+  const container = document.getElementById('ccCycleFields');
+  if(!container) return;
+  container.innerHTML = CC_CARDS.map(c => {
+    const opening = ccGetOpeningBal(c.id);
+    return `
+    <div style="border:1px solid ${c.color}22;border-radius:10px;padding:14px 16px;margin-bottom:12px;background:${c.color}08;">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:${c.color};display:inline-block;"></span>
+        <span style="font-size:12px;font-weight:600;color:${c.color};font-family:'Manrope',sans-serif;">${c.name}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+        <div class="field">
+          <label>Bill Generation Day</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="billday_${c.id}" min="1" max="31" value="${c.billDay}"
+              style="background:var(--surface2);border:1px solid ${c.color}44;border-radius:var(--r-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:15px;padding:8px 10px;outline:none;width:65px;text-align:center;"
+              onfocus="this.style.borderColor='${c.color}'" onblur="this.style.borderColor='${c.color}44'"/>
+            <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;">of month</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Payment Due Day</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="dueday_${c.id}" min="1" max="31" value="${c.dueDay}"
+              style="background:var(--surface2);border:1px solid ${c.color}44;border-radius:var(--r-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:15px;padding:8px 10px;outline:none;width:65px;text-align:center;"
+              onfocus="this.style.borderColor='${c.color}'" onblur="this.style.borderColor='${c.color}44'"/>
+            <span style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;">of next month</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Opening / Carried Balance (₹)</label>
+          <input type="number" id="opening_${c.id}" min="0" step="0.01" value="${opening}"
+            placeholder="0.00"
+            style="background:var(--surface2);border:1px solid ${c.color}44;border-radius:var(--r-sm);color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:8px 10px;outline:none;width:100%;"
+            onfocus="this.style.borderColor='${c.color}'" onblur="this.style.borderColor='${c.color}44'"/>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveCCCycleSettings() {
+  let valid = true;
+  CC_CARDS.forEach(c => {
+    const bdEl = document.getElementById('billday_' + c.id);
+    const ddEl = document.getElementById('dueday_'  + c.id);
+    const obEl = document.getElementById('opening_' + c.id);
+    if(!bdEl || !ddEl) { valid = false; return; }
+    const bd = parseInt(bdEl.value);
+    const dd = parseInt(ddEl.value);
+    const ob = parseFloat(obEl?.value || '0');
+    if(isNaN(bd)||bd<1||bd>31||isNaN(dd)||dd<1||dd>31) {
+      if(bdEl) bdEl.style.borderColor='var(--red)';
+      if(ddEl) ddEl.style.borderColor='var(--red)';
+      valid = false; return;
+    }
+    c.billDay = bd;
+    c.dueDay  = dd;
+    ccSetOpeningBal(c.id, isNaN(ob) ? 0 : ob);
+  });
+  if(!valid) {
+    const msg = document.getElementById('ccCycleMsg');
+    if(msg) { msg.style.color='var(--red)'; msg.textContent='Please enter valid days (1–31) for all cards.'; setTimeout(()=>msg.textContent='',3000); }
+    return;
+  }
+  ccSettingsSave();
+  renderCreditCards();
+  const msg = document.getElementById('ccCycleMsg');
+  if(msg) { msg.style.color='var(--green)'; msg.textContent='✓ Settings saved!'; setTimeout(()=>msg.textContent='',2500); }
+}
+
+function renderCCPayCardSelect() {
+  const sel = document.getElementById('ccPayCard');
+  if(!sel) return;
+  sel.innerHTML = CC_CARDS.map(c => `<option value="${c.id}">${c.name} · Outstanding: ₹${Math.max(0,ccBalance(c.id)).toLocaleString('en-IN')}</option>`).join('');
+}
+
+function renderCCFilterTabs() {
+  const wrap = document.getElementById('ccFilterTabs');
+  if(!wrap) return;
+  const filters = [{id:'all', label:'All'}, ...CC_CARDS.map(c => ({id:c.id, label:c.short}))];
+  wrap.innerHTML = filters.map(f => `
+    <button onclick="ccSetFilter('${f.id}')"
+      style="padding:5px 12px;border-radius:99px;border:1px solid ${f.id===ccActiveCard?'rgba(232,201,126,0.3)':'var(--border)'};background:${f.id===ccActiveCard?'var(--accent-dim)':'transparent'};color:${f.id===ccActiveCard?'var(--accent)':'var(--text2)'};font-family:'Manrope',sans-serif;font-size:11px;cursor:pointer;transition:all 0.13s;">
+      ${f.label}
+    </button>`).join('');
+}
+
+function ccSetFilter(cardId) {
+  ccActiveCard = cardId;
+  const lbl = document.getElementById('ccTxLabel');
+  if(lbl) lbl.textContent = cardId === 'all' ? 'All transactions' : CC_CARDS.find(c=>c.id===cardId)?.name + ' transactions';
+  renderCCFilterTabs();
+  renderCCTxList();
+}
+
+function renderCCTxList() {
+  const container = document.getElementById('ccTxList');
+  if(!container) return;
+
+  let filtered = ccTxns.filter(t => {
+    const d = new Date(t.date + 'T00:00:00');
+    const monthMatch = d.getFullYear() === ccViewMonth.year && d.getMonth() === ccViewMonth.month;
+    const cardMatch = ccActiveCard === 'all' || t.cardId === ccActiveCard;
+    return monthMatch && cardMatch;
+  }).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  if(!filtered.length) {
+    container.innerHTML = '<div class="tx-empty">No transactions this month.</div>';
+    return;
+  }
+
+  // Group by date
+  const groups = {};
+  filtered.forEach(t => { groups[t.date] = groups[t.date] || []; groups[t.date].push(t); });
+  const sortedDates = Object.keys(groups).sort((a,b) => new Date(b)-new Date(a));
+
+  container.innerHTML = sortedDates.map(dk => {
+    const dayTxns = groups[dk];
+    const dayNet = dayTxns.reduce((s,t) => t.isPayment ? s-t.amount : s+t.amount, 0);
+    const lbl = new Date(dk+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+    const rowsHtml = dayTxns.map(t => {
+      const card = CC_CARDS.find(c => c.id === t.cardId) || CC_CARDS[0];
+      const catEmoji = CC_CAT_EMOJI[t.cat] || '📦';
+      return `<div class="cc-tx-row">
+        <div class="cc-tx-icon" style="background:${t.isPayment?'rgba(126,232,176,0.12)':card.color+'18'}">${t.isPayment?'✅':catEmoji}</div>
+        <div class="cc-tx-info">
+          <div class="cc-tx-desc">${esc(t.desc||t.cat)}</div>
+          <div class="cc-tx-meta">${card.name} · ${t.isPayment?'Payment':'Spend'} · ${t.cat}${t.note?' · '+esc(t.note):''}</div>
+        </div>
+        <div class="cc-tx-right">
+          <div class="cc-tx-amt" style="color:${t.isPayment?'var(--green)':'var(--red)'}">${t.isPayment?'−':'+'} ₹${t.amount.toLocaleString('en-IN')}</div>
+          <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;">${new Date(dk+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</div>
+        </div>
+        <button class="del-btn" onclick="deleteCCTx('${t.id}')">✕</button>
+      </div>`;
+    }).join('');
+
+    return `<div style="padding:7px 14px;font-size:10px;letter-spacing:0.13em;text-transform:uppercase;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;">
+        <span>${lbl}</span>
+        <span style="color:${dayNet>=0?'var(--red)':'var(--green)'}">${dayNet>=0?'+':'−'} ₹${Math.abs(dayNet).toLocaleString('en-IN')}</span>
+      </div>${rowsHtml}`;
+  }).join('');
+}
+
+// ── ADD CC TRANSACTION ──
+function addCCTx() {
+  const cardId = document.getElementById('ccCardTabs')?.dataset.active || CC_CARDS[0].id;
+  const desc   = document.getElementById('ccDesc').value.trim();
+  const amt    = parseFloat(document.getElementById('ccAmt').value);
+  const cat    = document.getElementById('ccCat').value;
+  const date   = document.getElementById('ccDate').value;
+  const note   = document.getElementById('ccNote').value.trim();
+  if(!amt || amt <= 0 || !date) return;
+
+  ccTxns.unshift({
+    id: Date.now().toString(),
+    cardId, desc, amount: amt, cat, date, note,
+    isPayment: false
+  });
+  ccSave();
+  document.getElementById('ccDesc').value = '';
+  document.getElementById('ccAmt').value = '';
+  document.getElementById('ccNote').value = '';
+  renderCreditCards();
+  // Animate — card spend
+  animExpense(amt);
+  showToast('💳', '-₹' + Math.round(amt).toLocaleString('en-IN') + ' on ' + (CC_CARDS.find(c=>c.id===cardId)?.name||'Credit Card'), 'var(--red)');
+}
+
+// ── ADD CC PAYMENT ──
+function addCCPayment() {
+  const cardId = document.getElementById('ccPayCard').value;
+  const amt    = parseFloat(document.getElementById('ccPayAmt').value);
+  const date   = document.getElementById('ccPayDate').value;
+  if(!amt || amt <= 0 || !date) return;
+
+  const card = CC_CARDS.find(c => c.id === cardId);
+  ccTxns.unshift({
+    id: Date.now().toString(),
+    cardId,
+    desc: 'Payment - ' + (card?.name || ''),
+    amount: amt,
+    cat: 'Payment',
+    date, note: '',
+    isPayment: true
+  });
+  ccSave();
+  document.getElementById('ccPayAmt').value = '';
+  renderCreditCards();
+  showToast('✅', '₹' + Math.round(amt).toLocaleString('en-IN') + ' paid to ' + (card?.name || 'card'), 'var(--green)');
+}
+
+// ── DELETE ──
+function deleteCCTx(id) {
+  ccTxns = ccTxns.filter(t => t.id !== id);
+  ccSave();
+  renderCreditCards();
+}
+
+// ── MONTH NAV ──
+function ccChangeMonth(dir) {
+  ccViewMonth.month += dir;
+  if(ccViewMonth.month > 11) { ccViewMonth.month = 0; ccViewMonth.year++; }
+  if(ccViewMonth.month < 0)  { ccViewMonth.month = 11; ccViewMonth.year--; }
+  renderCreditCards();
+}
+
 // ═══════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════
 load();
+
+// ── SEED: Axis Laptop EMI ──
+// Runs once — sets opening balance and logs EMI transactions
+(function seedAxisEMI() {
+  if(localStorage.getItem('sf_cc_axis_emi_seeded')) return;
+
+  // 1. Set opening balance = full EMI principal loaded on card (42152 + 299)
+  if(!ccSettings['axis_cc']) ccSettings['axis_cc'] = {};
+  ccSettings['axis_cc'].openingBalance = 42451;
+  ccSettings['axis_cc'].billDay = 20;
+  ccSettings['axis_cc'].dueDay  = 10;
+  localStorage.setItem('sf_cc_settings', JSON.stringify(ccSettings));
+
+  // 2. Original purchase + processing fee (April — before tracking, informational)
+  const existing = ccTxns.map(t => t.id);
+  const toAdd = [
+    {
+      id: 'axis_emi_purchase',
+      cardId: 'axis_cc',
+      desc: 'Laptop Purchase (EMI)',
+      amount: 42152,
+      cat: 'EMI',
+      date: '2026-04-20',
+      note: '24-month EMI @ ₹2,161/month',
+      isPayment: false
+    },
+    {
+      id: 'axis_emi_fee',
+      cardId: 'axis_cc',
+      desc: 'EMI Processing Fee',
+      amount: 299,
+      cat: 'EMI',
+      date: '2026-04-20',
+      note: 'One-time processing fee',
+      isPayment: false
+    },
+    {
+      id: 'axis_emi_may',
+      cardId: 'axis_cc',
+      desc: 'Laptop EMI — Month 1/24',
+      amount: 2161,
+      cat: 'Payment',
+      date: '2026-05-10',
+      note: 'EMI payment May 2026',
+      isPayment: true
+    },
+    {
+      id: 'axis_emi_jun',
+      cardId: 'axis_cc',
+      desc: 'Laptop EMI — Month 2/24',
+      amount: 2161,
+      cat: 'Payment',
+      date: '2026-06-07',
+      note: 'EMI payment June 2026',
+      isPayment: true
+    }
+  ];
+
+  toAdd.forEach(t => { if(!existing.includes(t.id)) ccTxns.push(t); });
+  ccSave();
+
+  localStorage.setItem('sf_cc_axis_emi_seeded', '1');
+})();
+
 buildLockAcctGrid();
 buildParticles();
 showQuote();
 scheduleQuoteRefresh();
-loadFromUrl();
 </script>
 </body>
 </html>
